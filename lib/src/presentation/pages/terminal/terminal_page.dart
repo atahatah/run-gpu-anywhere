@@ -34,6 +34,26 @@ class TerminalPage extends ConsumerWidget {
                         .newHost(selectedHost);
                   },
                 ),
+                switch (ref.watch(runResultsProvider(loadedCurrentHost))) {
+                  AsyncError(:final error) => Text('Error: $error'),
+                  AsyncData(value: final results) => Column(
+                      children: [
+                        for (final result in results) Text(result.name),
+                        Row(
+                          children: [
+                            Text('Command: '),
+                            Text('_________'),
+                            // add button
+                            ElevatedButton(
+                              onPressed: () {},
+                              child: const Text('Run'),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  _ => const CircularProgressIndicator(),
+                },
               ],
             ),
           _ => const CircularProgressIndicator(),
