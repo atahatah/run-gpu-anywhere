@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:run_gpu_anywhere/src/presentation/pages/command_template/command_template_list_page.dart';
 import 'package:run_gpu_anywhere/src/presentation/pages/host_list/add_host_page.dart';
 import 'package:run_gpu_anywhere/src/presentation/pages/host_list/host_list_page.dart';
 import 'package:run_gpu_anywhere/src/presentation/pages/main/main_page.dart';
@@ -60,6 +61,16 @@ GoRouter router(RouterRef ref) {
           return NoTransitionPage<void>(
             key: state.pageKey,
             child: AddHostPage(),
+          );
+        },
+      ),
+      GoRoute(
+        path: CommandTemplateListPage.pagePath,
+        name: CommandTemplateListPage.pageName,
+        pageBuilder: (_, state) {
+          return NoTransitionPage<void>(
+            key: state.pageKey,
+            child: const CommandTemplateListPage(),
           );
         },
       ),

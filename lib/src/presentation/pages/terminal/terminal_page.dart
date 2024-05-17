@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:run_gpu_anywhere/src/model/use_cases/terminal/ssh_host_controller.dart';
 import 'package:run_gpu_anywhere/src/model/use_cases/terminal/terminal_controller.dart';
+import 'package:run_gpu_anywhere/src/presentation/components/bottom_navigation_bar.dart';
 import 'package:run_gpu_anywhere/src/presentation/pages/host_list/host_list_page.dart';
 import 'package:run_gpu_anywhere/src/presentation/pages/terminal/input_suggester.dart';
 import 'package:run_gpu_anywhere/src/presentation/pages/terminal/virtual_keyboard.dart';
@@ -13,8 +14,8 @@ import '../../../model/entities/ssh/host.dart';
 class TerminalPage extends ConsumerWidget {
   const TerminalPage({super.key});
 
-  static String get pageName => 'TerminalPage';
-  static String get pagePath => '/terminal';
+  static const pageName = 'TerminalPage';
+  static const pagePath = '/terminal';
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -24,6 +25,7 @@ class TerminalPage extends ConsumerWidget {
       appBar: AppBar(
         title: const Text('Terminal'),
       ),
+      bottomNavigationBar: const MyBottomNavigationBar(),
       body: Column(
         children: [
           ElevatedButton(

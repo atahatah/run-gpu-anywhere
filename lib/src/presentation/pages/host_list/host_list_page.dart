@@ -4,11 +4,13 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:run_gpu_anywhere/src/model/use_cases/terminal/ssh_host_controller.dart';
 import 'package:run_gpu_anywhere/src/presentation/pages/host_list/add_host_page.dart';
 
+import '../../components/bottom_navigation_bar.dart';
+
 class HostListPage extends ConsumerWidget {
   const HostListPage({super.key});
 
-  static String get pageName => 'HostsListPage';
-  static String get pagePath => '/hosts_list';
+  static const String pageName = 'HostsListPage';
+  static const String pagePath = '/hosts_list';
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -31,6 +33,7 @@ class HostListPage extends ConsumerWidget {
           ),
         ],
       ),
+      bottomNavigationBar: const MyBottomNavigationBar(),
       body: hosts.when(
         loading: () => const CircularProgressIndicator(),
         error: (error, stackTrace) => Text('Error: $error'),
