@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:run_gpu_anywhere/src/model/use_cases/terminal/virtual_keyboard_controller.dart';
 import 'package:run_gpu_anywhere/src/model/use_cases/terminal/ssh_host_controller.dart';
 import 'package:run_gpu_anywhere/src/model/use_cases/terminal/terminal_controller.dart';
 import 'package:run_gpu_anywhere/src/presentation/pages/host_list/host_list_page.dart';
-import 'package:run_gpu_anywhere/src/presentation/pages/terminal/vertural_keyboard.dart';
+import 'package:run_gpu_anywhere/src/presentation/pages/terminal/input_suggester.dart';
+import 'package:run_gpu_anywhere/src/presentation/pages/terminal/virtual_keyboard.dart';
 import 'package:xterm/xterm.dart';
 
 import '../../../model/entities/ssh/host.dart';
@@ -103,7 +103,7 @@ class TerminalComponent extends ConsumerWidget {
               ),
             ),
             if (manually) const VirtualKeyboardView(),
-            if (!manually) const SizedBox(height: 0),
+            if (!manually) const InputSuggester(),
           ],
         ),
       _ => const CircularProgressIndicator(),
