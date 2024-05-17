@@ -4,6 +4,8 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:run_gpu_anywhere/src/model/use_cases/terminal/ssh_host_controller.dart';
 import 'package:run_gpu_anywhere/src/model/use_cases/terminal/terminal_controller.dart';
 import 'package:run_gpu_anywhere/src/presentation/pages/host_list/host_list_page.dart';
+import 'package:run_gpu_anywhere/src/presentation/pages/terminal/xterm_sample.dart';
+import 'package:xterm/xterm.dart';
 
 import '../../../model/entities/ssh/host.dart';
 
@@ -58,11 +60,8 @@ class TerminalPage extends ConsumerWidget {
                               .newHost(selectedHost);
                         },
                       ),
-                      SizedBox(
-                        height: 400,
-                        child: RunResultComponent(
-                          loadedCurrentHost: loadedCurrentHost,
-                        ),
+                      RunResultComponent(
+                        host: loadedCurrentHost,
                       ),
                     ],
                   ),
@@ -79,33 +78,29 @@ class TerminalPage extends ConsumerWidget {
 class RunResultComponent extends ConsumerWidget {
   const RunResultComponent({
     super.key,
-    required this.loadedCurrentHost,
+    required this.host,
   });
 
-  final Host loadedCurrentHost;
+  final Host host;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final runResults = ref.watch(runResultsProvider(loadedCurrentHost));
-    return SingleChildScrollView(
-      child: Column(
-        children: [
-          for (final result in runResults) Text(result.name),
-          Row(
-            children: [
-              const Text('Command: '),
-              const Text('_________'),
-              // add button
-              ElevatedButton(
-                onPressed: () {},
-                child: const Text('Run'),
-              ),
-            ],
-          ),
-          DebugComponent(host: loadedCurrentHost),
-        ],
-      ),
-    );
+    final terminal = ref.watch(terminalControllerProvider(host));
+    return switch (terminal) {
+      AsyncError(:final error) => Text('Error: $error'),
+      AsyncData(value: final terminal) => Column(
+          children: [
+            SizedBox(height: 200, child: TerminalView(terminal)),
+            ElevatedButton(
+              onPressed: () {
+                ref.read(terminalControllerProvider(host).notifier).run('ls');
+              },
+              child: const Text('ls'),
+            ),
+          ],
+        ),
+      _ => const CircularProgressIndicator(),
+    };
   }
 }
 

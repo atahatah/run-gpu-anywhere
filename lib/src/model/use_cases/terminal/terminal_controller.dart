@@ -1,8 +1,11 @@
+import 'package:flutter/material.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:run_gpu_anywhere/src/model/repositories/ssh/ssh_client.dart';
 import 'package:run_gpu_anywhere/src/model/use_cases/terminal/ssh_host_controller.dart';
+import 'package:xterm/xterm.dart';
 import '../../entities/ssh/host.dart';
 import '../../entities/terminal/run_result.dart';
+import '../../../utils/extension.dart';
 
 part 'terminal_controller.g.dart';
 
@@ -43,22 +46,32 @@ class RunResults extends _$RunResults {
 @riverpod
 class TerminalController extends _$TerminalController {
   @override
-  Future<bool> build(Host host) async {
+  Future<Terminal> build(Host host) async {
     final repository = ref.watch(sshClientRepositoryProvider(host));
     await repository.connect();
-    return repository.connected;
+    final terminal = Terminal(onOutput: _inputHandler);
+    repository.stdout.listen(terminal.write);
+    repository.stderr.listen(terminal.write);
+    return terminal;
+  }
+
+  void _inputHandler(String? message) {
+    if (message == null) {
+      return;
+    }
+    debugPrint(message);
+    ref.watch(sshClientRepositoryProvider(host)).stdin(message);
   }
 
   Future<String> run(String command) async {
     return state.when(
-      data: (state) async {
-        if (!state) {
+      data: (terminal) async {
+        final repository = ref.watch(sshClientRepositoryProvider(host));
+        if (!repository.connected) {
           throw Exception('Not connected');
         }
-        final repository = ref.watch(sshClientRepositoryProvider(host));
-        // repository.stdin(command);
-        final result = await repository.run(command);
-        ref.read(runResultsProvider(host).notifier).add(result);
+        // if command doesn't end with newline, add it
+        repository.stdin(command.shouldEndWith('\n'));
         return '';
       },
       loading: () => throw Exception('Loading'),
