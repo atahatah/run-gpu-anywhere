@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:run_gpu_anywhere/src/model/repositories/ssh/ssh_client.dart';
 import 'package:run_gpu_anywhere/src/model/use_cases/terminal/ssh_host_controller.dart';
 import 'package:run_gpu_anywhere/src/model/use_cases/terminal/terminal_controller.dart';
 import 'package:run_gpu_anywhere/src/presentation/pages/host_list/host_list_page.dart';
@@ -31,61 +30,79 @@ class TerminalPage extends ConsumerWidget {
             child: const Text('Add Host'),
           ),
           sshHosts.when(
-              loading: () => const CircularProgressIndicator(),
-              error: (error, stackTrace) => Text('Error: $error'),
-              data: (loadedSshHosts) {
-                if (loadedSshHosts.isEmpty) {
-                  return const Text('No hosts');
-                }
-                return switch (currentHost) {
-                  AsyncError(:final error) => Text('Error: $error'),
-                  AsyncData(value: final loadedCurrentHost) => Column(
-                      children: [
-                        DropdownButton(
-                          value: loadedCurrentHost,
-                          items: [
-                            for (final sshHost in loadedSshHosts)
-                              DropdownMenuItem(
-                                value: sshHost,
-                                child: Text(sshHost.name),
-                              ),
-                          ],
-                          onChanged: (selectedHost) {
-                            if (selectedHost == null) {
-                              return;
-                            }
-                            ref
-                                .read(currentHostProvider.notifier)
-                                .newHost(selectedHost);
-                          },
-                        ),
-                        switch (
-                            ref.watch(runResultsProvider(loadedCurrentHost))) {
-                          AsyncError(:final error) => Text('Error: $error'),
-                          AsyncData(value: final results) => Column(
-                              children: [
-                                for (final result in results) Text(result.name),
-                                Row(
-                                  children: [
-                                    Text('Command: '),
-                                    Text('_________'),
-                                    // add button
-                                    ElevatedButton(
-                                      onPressed: () {},
-                                      child: const Text('Run'),
-                                    ),
-                                  ],
-                                ),
-                                DebugComponent(host: loadedCurrentHost),
-                              ],
+            loading: () => const CircularProgressIndicator(),
+            error: (error, stackTrace) => Text('Error: $error'),
+            data: (loadedSshHosts) {
+              if (loadedSshHosts.isEmpty) {
+                return const Text('No hosts');
+              }
+              return switch (currentHost) {
+                AsyncError(:final error) => Text('Error: $error'),
+                AsyncData(value: final loadedCurrentHost) => Column(
+                    children: [
+                      DropdownButton(
+                        value: loadedCurrentHost,
+                        items: [
+                          for (final sshHost in loadedSshHosts)
+                            DropdownMenuItem(
+                              value: sshHost,
+                              child: Text(sshHost.name),
                             ),
-                          _ => const CircularProgressIndicator(),
+                        ],
+                        onChanged: (selectedHost) {
+                          if (selectedHost == null) {
+                            return;
+                          }
+                          ref
+                              .read(currentHostProvider.notifier)
+                              .newHost(selectedHost);
                         },
-                      ],
-                    ),
-                  _ => const CircularProgressIndicator(),
-                };
-              }),
+                      ),
+                      SizedBox(
+                        height: 400,
+                        child: RunResultComponent(
+                          loadedCurrentHost: loadedCurrentHost,
+                        ),
+                      ),
+                    ],
+                  ),
+                _ => const CircularProgressIndicator(),
+              };
+            },
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class RunResultComponent extends ConsumerWidget {
+  const RunResultComponent({
+    super.key,
+    required this.loadedCurrentHost,
+  });
+
+  final Host loadedCurrentHost;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final runResults = ref.watch(runResultsProvider(loadedCurrentHost));
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          for (final result in runResults) Text(result.name),
+          Row(
+            children: [
+              const Text('Command: '),
+              const Text('_________'),
+              // add button
+              ElevatedButton(
+                onPressed: () {},
+                child: const Text('Run'),
+              ),
+            ],
+          ),
+          DebugComponent(host: loadedCurrentHost),
         ],
       ),
     );
@@ -98,16 +115,17 @@ class DebugComponent extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final runnerState = ref.watch(sSHClientWrapperProvider(host));
-    final runner = ref.read(sSHClientWrapperProvider(host).notifier);
+    final runnerState = ref.watch(terminalControllerProvider(host));
+    final runner = ref.read(terminalControllerProvider(host).notifier);
     return switch (runnerState) {
       AsyncError(:final error) => Text('Error: $error'),
       AsyncData(value: final _) => ElevatedButton(
           onPressed: () async {
-            final result = await runner.run('ls');
+            final result = await runner.run('pwd');
             debugPrint(result);
           },
-          child: const Text('Debug')),
+          child: const Text('Debug'),
+        ),
       _ => const CircularProgressIndicator(),
     };
   }
