@@ -7,6 +7,7 @@ import 'package:xterm/xterm.dart';
 import '../../../utils/extension.dart';
 import '../../entities/ssh/host.dart';
 import '../../entities/terminal/run_result.dart';
+import 'virtual_keyboard_controller.dart';
 
 part 'terminal_controller.g.dart';
 
@@ -50,7 +51,9 @@ class TerminalController extends _$TerminalController {
   Future<Terminal> build(Host host) async {
     final repository = ref.watch(sshClientRepositoryProvider(host));
     await repository.connect();
-    final terminal = Terminal(onOutput: _inputHandler);
+    final virtualKeyboard = ref.watch(virtualKeyboardControllerProvider);
+    final terminal =
+        Terminal(onOutput: _inputHandler, inputHandler: virtualKeyboard);
     repository.stdout.listen(terminal.write);
     repository.stderr.listen(terminal.write);
     return terminal;

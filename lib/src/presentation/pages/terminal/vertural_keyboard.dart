@@ -1,80 +1,32 @@
 import 'package:flutter/material.dart';
-import 'package:xterm/xterm.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:run_gpu_anywhere/src/model/use_cases/terminal/virtual_keyboard_controller.dart';
 
-class MyVirtualKeyboardView extends StatelessWidget {
-  const MyVirtualKeyboardView(this.keyboard, {super.key});
-
-  final MyVirtualKeyboard keyboard;
+class VirtualKeyboardView extends ConsumerWidget {
+  const VirtualKeyboardView({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final keyboard = ref.watch(virtualKeyboardControllerProvider);
     return AnimatedBuilder(
       animation: keyboard,
       builder: (context, child) => ToggleButtons(
-        children: [Text('Ctrl'), Text('Alt'), Text('Shift')],
-        isSelected: [keyboard.ctrl, keyboard.alt, keyboard.shift],
-        onPressed: (index) {
-          switch (index) {
-            case 0:
-              keyboard.ctrl = !keyboard.ctrl;
-              break;
-            case 1:
-              keyboard.alt = !keyboard.alt;
-              break;
-            case 2:
-              keyboard.shift = !keyboard.shift;
-              break;
-          }
-        },
+        isSelected: [
+          keyboard.ctrl,
+          keyboard.shift,
+          keyboard.alt,
+        ],
+        onPressed: (index) => keyboard.update(
+          ctrl: index == 0 ? !keyboard.ctrl : keyboard.ctrl,
+          shift: index == 1 ? !keyboard.shift : keyboard.shift,
+          alt: index == 2 ? !keyboard.alt : keyboard.alt,
+        ),
+        children: const [
+          Text('ctrl'),
+          Text('shift'),
+          Text('alt'),
+        ],
       ),
     );
-  }
-}
-
-class MyVirtualKeyboard extends TerminalInputHandler with ChangeNotifier {
-  final TerminalInputHandler _inputHandler;
-
-  MyVirtualKeyboard(this._inputHandler);
-
-  bool _ctrl = false;
-
-  bool get ctrl => _ctrl;
-
-  set ctrl(bool value) {
-    if (_ctrl != value) {
-      _ctrl = value;
-      notifyListeners();
-    }
-  }
-
-  bool _shift = false;
-
-  bool get shift => _shift;
-
-  set shift(bool value) {
-    if (_shift != value) {
-      _shift = value;
-      notifyListeners();
-    }
-  }
-
-  bool _alt = false;
-
-  bool get alt => _alt;
-
-  set alt(bool value) {
-    if (_alt != value) {
-      _alt = value;
-      notifyListeners();
-    }
-  }
-
-  @override
-  String? call(TerminalKeyboardEvent event) {
-    return _inputHandler.call(event.copyWith(
-      ctrl: event.ctrl || _ctrl,
-      shift: event.shift || _shift,
-      alt: event.alt || _alt,
-    ));
   }
 }
