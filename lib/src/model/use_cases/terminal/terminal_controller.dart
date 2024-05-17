@@ -3,9 +3,10 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:run_gpu_anywhere/src/model/repositories/ssh/ssh_client.dart';
 import 'package:run_gpu_anywhere/src/model/use_cases/terminal/ssh_host_controller.dart';
 import 'package:xterm/xterm.dart';
+
+import '../../../utils/extension.dart';
 import '../../entities/ssh/host.dart';
 import '../../entities/terminal/run_result.dart';
-import '../../../utils/extension.dart';
 
 part 'terminal_controller.g.dart';
 

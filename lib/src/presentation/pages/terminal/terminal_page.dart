@@ -4,7 +4,6 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:run_gpu_anywhere/src/model/use_cases/terminal/ssh_host_controller.dart';
 import 'package:run_gpu_anywhere/src/model/use_cases/terminal/terminal_controller.dart';
 import 'package:run_gpu_anywhere/src/presentation/pages/host_list/host_list_page.dart';
-import 'package:run_gpu_anywhere/src/presentation/pages/terminal/xterm_sample.dart';
 import 'package:xterm/xterm.dart';
 
 import '../../../model/entities/ssh/host.dart';
@@ -90,7 +89,13 @@ class RunResultComponent extends ConsumerWidget {
       AsyncError(:final error) => Text('Error: $error'),
       AsyncData(value: final terminal) => Column(
           children: [
-            SizedBox(height: 200, child: TerminalView(terminal)),
+            SizedBox(
+              height: 200,
+              child: TerminalView(
+                terminal,
+                deleteDetection: true,
+              ),
+            ),
             ElevatedButton(
               onPressed: () {
                 ref.read(terminalControllerProvider(host).notifier).run('ls');
@@ -98,28 +103,6 @@ class RunResultComponent extends ConsumerWidget {
               child: const Text('ls'),
             ),
           ],
-        ),
-      _ => const CircularProgressIndicator(),
-    };
-  }
-}
-
-class DebugComponent extends ConsumerWidget {
-  const DebugComponent({super.key, required this.host});
-  final Host host;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final runnerState = ref.watch(terminalControllerProvider(host));
-    final runner = ref.read(terminalControllerProvider(host).notifier);
-    return switch (runnerState) {
-      AsyncError(:final error) => Text('Error: $error'),
-      AsyncData(value: final _) => ElevatedButton(
-          onPressed: () async {
-            final result = await runner.run('pwd');
-            debugPrint(result);
-          },
-          child: const Text('Debug'),
         ),
       _ => const CircularProgressIndicator(),
     };
