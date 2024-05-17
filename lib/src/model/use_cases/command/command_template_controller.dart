@@ -4,7 +4,7 @@ import 'package:run_gpu_anywhere/src/model/entities/command/command_template_par
 
 part 'command_template_controller.g.dart';
 
-const t = CommandTemplate(name: 'ls', command: 'ls \\0 \$HOME');
+const t = CommandTemplate(name: 'ls', command: 'ls \\0 \$HOME', split: ' ');
 
 @riverpod
 class CommandTemplateList extends _$CommandTemplateList {
@@ -12,9 +12,9 @@ class CommandTemplateList extends _$CommandTemplateList {
   Future<List<CommandTemplate>> build() async {
     await Future<void>.delayed(const Duration(seconds: 1));
     return const [
-      CommandTemplate(name: 'temp1', command: 'command1'),
-      CommandTemplate(name: 'temp2', command: 'command2'),
-      CommandTemplate(name: 'temp3', command: 'command3'),
+      CommandTemplate(name: 'temp1', command: 'command1', split: ' '),
+      CommandTemplate(name: 'temp2', command: 'command2', split: ' '),
+      CommandTemplate(name: 'temp3', command: 'command3', split: ' '),
       t,
     ];
   }

@@ -8,6 +8,7 @@ class CommandTemplate with _$CommandTemplate {
   const factory CommandTemplate({
     required String name,
     required String command,
+    required String split,
   }) = _CommandTemplate;
 
   factory CommandTemplate.fromJson(Map<String, dynamic> json) =>

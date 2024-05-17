@@ -67,10 +67,16 @@ class CommandBuildController extends _$CommandBuildController {
     final currentCommandParts =
         ref.watch(currentCommandPartsProvider(currentCommandTemplate));
 
+    if (!currentCommandTemplate.command.contains(r'\0')) {
+      return currentCommandTemplate.command;
+    }
+
     final formerPart = currentCommandTemplate.command.split('\\0').first;
     final latterPart = currentCommandTemplate.command.split('\\0').last;
-    final builtCommand =
-        '$formerPart${currentCommandParts.map((e) => e.command).join()}$latterPart';
+    final partSet = currentCommandParts
+        .map((e) => e.command)
+        .join(currentCommandTemplate.split);
+    final builtCommand = '$formerPart$partSet$latterPart';
     return builtCommand;
   }
 }
