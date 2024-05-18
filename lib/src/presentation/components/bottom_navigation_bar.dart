@@ -52,8 +52,6 @@ class CurrentBottomNavigationBarIndex
   }
 }
 
-const homePath = TerminalPage.pagePath;
-
 enum BottomNavigationBarItems {
   home(Icons.terminal, 'Terminal', TerminalPage.pagePath),
   search(Icons.computer, 'Hosts', HostListPage.pagePath),

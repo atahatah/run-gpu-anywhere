@@ -6,7 +6,7 @@ part 'command_template_controller.g.dart';
 
 const t = CommandTemplate(name: 'ls', command: 'ls \\0 \$HOME', split: ' ');
 
-@riverpod
+@Riverpod(keepAlive: true)
 class CommandTemplateList extends _$CommandTemplateList {
   @override
   Future<List<CommandTemplate>> build() async {
@@ -18,9 +18,21 @@ class CommandTemplateList extends _$CommandTemplateList {
       t,
     ];
   }
+
+  Future<void> add(CommandTemplate commandTemplate) async {
+    state.maybeWhen(
+      data: (commandTemplateList) {
+        if (commandTemplateList.contains(commandTemplate)) {
+          return;
+        }
+        state = AsyncData([...commandTemplateList, commandTemplate]);
+      },
+      orElse: () {},
+    );
+  }
 }
 
-@riverpod
+@Riverpod(keepAlive: true)
 class CommandTemplateUsedParts extends _$CommandTemplateUsedParts {
   @override
   Future<List<CommandTemplatePart>> build(
