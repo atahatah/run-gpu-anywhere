@@ -27,9 +27,15 @@ class SSHHostList extends _$SSHHostList {
       final ip = prefs.getString('$hostName.ip');
       final port = prefs.getInt('$hostName.port');
       final username = prefs.getString('$hostName.username');
+      final lang = prefs.getString('$hostName.lang');
       final password = await secureStorage.read(key: '$hostName.password');
-      if (ip == null || port == null || username == null || password == null) {
+      if (ip == null ||
+          port == null ||
+          username == null ||
+          password == null ||
+          lang == null) {
         debugPrint('failed to load host info: $hostName');
+        debugPrint('info: $ip, $port, $username, $password, $lang');
         continue;
       }
       hosts.add(
@@ -39,6 +45,7 @@ class SSHHostList extends _$SSHHostList {
           port: port,
           userName: username,
           password: password,
+          lang: lang,
         ),
       );
     }
@@ -64,6 +71,7 @@ class SSHHostList extends _$SSHHostList {
         await prefs.setString('${host.name}.ip', host.ip);
         await prefs.setInt('${host.name}.port', host.port);
         await prefs.setString('${host.name}.username', host.userName);
+        await prefs.setString('${host.name}.lang', host.lang);
         const secureStorage = FlutterSecureStorage();
         await secureStorage.write(
           key: '${host.name}.password',

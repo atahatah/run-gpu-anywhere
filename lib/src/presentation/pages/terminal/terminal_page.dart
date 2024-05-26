@@ -116,7 +116,7 @@ class TerminalComponent extends ConsumerWidget {
       AsyncData(value: final terminal) => Column(
           children: [
             SizedBox(
-              height: 200,
+              height: 300,
               child: TerminalView(
                 terminal,
                 deleteDetection: true,

@@ -6,7 +6,6 @@ import 'package:xterm/xterm.dart';
 
 import '../../../utils/extension.dart';
 import '../../entities/ssh/host.dart';
-import '../../entities/terminal/run_result.dart';
 import 'virtual_keyboard_controller.dart';
 
 part 'terminal_controller.g.dart';
@@ -29,23 +28,6 @@ class CurrentHost extends _$CurrentHost {
 }
 
 @riverpod
-class RunResults extends _$RunResults {
-  @override
-  List<RunResult> build(Host host) {
-    final repository = ref.watch(sshClientRepositoryProvider(host));
-    repository.stdout.listen(add);
-    repository.stderr.listen(add);
-    return [];
-  }
-
-  void add(String result) {
-    final withoutEscape =
-        result.replaceAll(RegExp(r'\x1B\[[0-?]*[ -/]*[@-~]'), '');
-    state = [...state, RunResult(name: withoutEscape)];
-  }
-}
-
-@riverpod
 class TerminalController extends _$TerminalController {
   @override
   Future<Terminal> build(Host host) async {
@@ -54,8 +36,8 @@ class TerminalController extends _$TerminalController {
     final virtualKeyboard = ref.watch(virtualKeyboardControllerProvider);
     final terminal =
         Terminal(onOutput: _inputHandler, inputHandler: virtualKeyboard);
-    repository.stdout.listen(terminal.write);
-    repository.stderr.listen(terminal.write);
+    repository.stdout?.listen(terminal.write);
+    repository.stderr?.listen(terminal.write);
     return terminal;
   }
 

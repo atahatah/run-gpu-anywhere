@@ -7,7 +7,8 @@
         {
             "name": "run_gpu_anywhere",
             "request": "launch",
-            "type": "dart"
+            "type": "dart",
+            "deviceId": "00008030-001105463C9A402E",
         },
         {
             "name": "run_gpu_anywhere (profile mode)",

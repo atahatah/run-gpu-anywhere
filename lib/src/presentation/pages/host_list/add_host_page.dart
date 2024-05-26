@@ -12,8 +12,9 @@ class AddHostPage extends ConsumerWidget {
 
   final name = TextEditingController();
   final ip = TextEditingController();
-  final port = TextEditingController();
+  final port = TextEditingController(text: '22');
   final userName = TextEditingController();
+  final lang = TextEditingController(text: 'ja_JP.UTF-8');
   final password = TextEditingController();
 
   @override
@@ -40,6 +41,10 @@ class AddHostPage extends ConsumerWidget {
               TextField(
                 controller: userName,
               ),
+              const Text('Lang:'),
+              TextField(
+                controller: lang,
+              ),
               const Text('Password:'),
               TextField(controller: password, obscureText: true),
               ElevatedButton(
@@ -51,6 +56,7 @@ class AddHostPage extends ConsumerWidget {
                     port: int.parse(port.text),
                     userName: userName.text,
                     password: password.text,
+                    lang: lang.text,
                   );
                   final sshHostListController =
                       ref.read(sSHHostListProvider.notifier);

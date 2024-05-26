@@ -10,6 +10,7 @@ class Host with _$Host {
     required int port,
     required String userName,
     required String password,
+    required String lang,
   }) = _Host;
 
   factory Host.fromJson(Map<String, dynamic> json) => _$HostFromJson(json);

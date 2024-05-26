@@ -16,30 +16,35 @@ SSHClientWrapper sshClientRepository(SshClientRepositoryRef ref, Host host) {
 
 class SSHClientWrapper {
   SSHClientWrapper(this.host);
-
   final Host host;
   SSHClient? _client;
-  SSHSession? __shell;
+  SSHSession? _shell;
   bool _loading = false;
   bool _connected = false;
-  final _stdoutController = StreamController<String>.broadcast();
-  final _stderrController = StreamController<String>.broadcast();
-
-  SSHSession? get _shell => __shell;
-  set _shell(SSHSession? shell) {
-    __shell = shell;
-    shell?.stdout.listen((event) {
-      _stdoutController.add(utf8.decode(event));
-    });
-    shell?.stderr.listen((event) {
-      _stderrController.add(utf8.decode(event));
-    });
-  }
 
   bool get loading => _loading;
   bool get connected => _connected;
-  Stream<String> get stdout => _stdoutController.stream;
-  Stream<String> get stderr => _stderrController.stream;
+  Stream<String>? get stdout {
+    try {
+      return _shell?.stdout
+          .cast<List<int>>()
+          .transform<String>(const Utf8Decoder(allowMalformed: true));
+    } on FormatException catch (e) {
+      debugPrint(e.toString());
+    }
+    return null;
+  }
+
+  Stream<String>? get stderr {
+    try {
+      return _shell?.stderr
+          .cast<List<int>>()
+          .transform<String>(const Utf8Decoder(allowMalformed: true));
+    } on FormatException catch (e) {
+      debugPrint(e.toString());
+    }
+    return null;
+  }
 
   void stdin(String value) {
     _shell!.stdin.add(utf8.encode(value));
@@ -57,7 +62,7 @@ class SSHClientWrapper {
     );
     debugPrint('authenticated');
     debugPrint('opening shell...');
-    final shell = await client.shell();
+    final shell = await client.shell(environment: {'LANG': host.lang});
     debugPrint('shell opened');
 
     debugPrint('success loading ssh client');
