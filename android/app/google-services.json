@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "626709432503",
+    "project_id": "run-anywhere-b962d",
+    "storage_bucket": "run-anywhere-b962d.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:626709432503:android:21a23f335042f72700a532",
+        "android_client_info": {
+          "package_name": "jp.hatahata.runAnywhere"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAaxEIKCINs42GlJgnEyOSJOmnbna0erYY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

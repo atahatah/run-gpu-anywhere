@@ -1,4 +1,4 @@
-package com.example.run_gpu_anywhere
+package jp.hatahata.runAnywhere
 
 import io.flutter.embedding.android.FlutterActivity
 
