@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:run_gpu_anywhere/src/model/entities/command/command_template.dart';
@@ -29,7 +30,7 @@ class InputSuggester extends HookConsumerWidget {
               ],
             ),
             const CurrentBuiltCommandComponent(),
-            const CommandTemplatePartComponent(),
+            CommandTemplatePartComponent(),
           ],
         );
       },
@@ -163,7 +164,8 @@ class CurrentBuiltCommandComponent extends ConsumerWidget {
 }
 
 class CommandTemplatePartComponent extends ConsumerWidget {
-  const CommandTemplatePartComponent({super.key});
+  CommandTemplatePartComponent({super.key});
+  final tc = TextEditingController();
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -185,19 +187,60 @@ class CommandTemplatePartComponent extends ConsumerWidget {
         }
         return Column(
           children: [
-            for (final commandTemplatePart in loadedCommandTemplateParts)
-              if (!currentCommandParts.contains(commandTemplatePart))
-                GestureDetector(
-                  child: Text(commandTemplatePart.command),
-                  onTap: () {
+            RichText(
+              text: TextSpan(
+                style: const TextStyle(color: Colors.black),
+                children: [
+                  for (final commandTemplatePart in loadedCommandTemplateParts)
+                    if (!currentCommandParts.contains(commandTemplatePart))
+                      TextSpan(
+                        text: '${commandTemplatePart.command} ',
+                        recognizer: TapGestureRecognizer()
+                          ..onTap = () {
+                            ref
+                                .read(
+                                  currentCommandPartsProvider(
+                                    currentCommandTemplate,
+                                  ).notifier,
+                                )
+                                .add(commandTemplatePart);
+                          },
+                      ),
+                ],
+              ),
+            ),
+            Row(
+              children: [
+                const Text('Another part: '),
+                SizedBox(
+                  width: 200,
+                  child: TextField(
+                    controller: tc,
+                  ),
+                ),
+                ElevatedButton(
+                  onPressed: () async {
+                    final newCommandTemplatePart = await ref
+                        .read(
+                          commandTemplateUsedPartsProvider(
+                            currentCommandTemplate,
+                          ).notifier,
+                        )
+                        .touch(tc.text);
+                    if (newCommandTemplatePart == null) {
+                      return;
+                    }
                     ref
                         .read(
                           currentCommandPartsProvider(currentCommandTemplate)
                               .notifier,
                         )
-                        .add(commandTemplatePart);
+                        .add(newCommandTemplatePart);
                   },
+                  child: const Text('Use'),
                 ),
+              ],
+            ),
           ],
         );
       },

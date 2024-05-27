@@ -4,7 +4,11 @@ import 'package:run_gpu_anywhere/src/model/entities/command/command_template_par
 
 part 'command_template_controller.g.dart';
 
-const t = CommandTemplate(name: 'ls', command: 'ls \\0 \$HOME', split: ' ');
+const sample1 =
+    CommandTemplate(name: 'ls', command: 'ls \\0 \$HOME', split: ' ');
+const sample2 =
+    CommandTemplate(name: 'echo', command: 'echo "\\0"', split: ', ');
+const sample3 = CommandTemplate(name: 'ping', command: 'ping \\0', split: ' ');
 
 @Riverpod(keepAlive: true)
 class CommandTemplateList extends _$CommandTemplateList {
@@ -12,10 +16,9 @@ class CommandTemplateList extends _$CommandTemplateList {
   Future<List<CommandTemplate>> build() async {
     await Future<void>.delayed(const Duration(seconds: 1));
     return const [
-      CommandTemplate(name: 'temp1', command: 'command1', split: ' '),
-      CommandTemplate(name: 'temp2', command: 'command2', split: ' '),
-      CommandTemplate(name: 'temp3', command: 'command3', split: ' '),
-      t,
+      sample1,
+      sample2,
+      sample3,
     ];
   }
 
@@ -55,17 +58,49 @@ class CommandTemplateUsedParts extends _$CommandTemplateUsedParts {
     CommandTemplate commandTemplate,
   ) async {
     await Future<void>.delayed(const Duration(seconds: 1));
-    if (commandTemplate == t) {
+    if (commandTemplate == sample1) {
       return const [
         CommandTemplatePart(command: '-a', position: 0),
         CommandTemplatePart(command: '-l', position: 0),
         CommandTemplatePart(command: '-h', position: 0),
       ];
     }
-    return const [
-      CommandTemplatePart(command: 'part1', position: 0),
-      CommandTemplatePart(command: 'part2', position: 0),
-      CommandTemplatePart(command: 'part3', position: 0),
-    ];
+    if (commandTemplate == sample2) {
+      return const [
+        CommandTemplatePart(command: 'Hello', position: 0),
+        CommandTemplatePart(command: 'new', position: 0),
+        CommandTemplatePart(command: 'World', position: 0),
+      ];
+    }
+    if (commandTemplate == sample3) {
+      return const [
+        CommandTemplatePart(command: 'localhost', position: 0),
+        CommandTemplatePart(command: '-c 4', position: 0),
+        CommandTemplatePart(command: '-4', position: 0),
+        CommandTemplatePart(command: '8.8.8.8', position: 0),
+      ];
+    }
+    return const [];
+  }
+
+  Future<CommandTemplatePart?> touch(
+    String usedPart, {
+    int position = 0,
+  }) async {
+    return state.maybeWhen(
+      data: (commandTemplatePartList) {
+        final newCommandTemplatePart =
+            CommandTemplatePart(command: usedPart, position: position);
+        state = AsyncData(
+          [
+            newCommandTemplatePart,
+            ...commandTemplatePartList
+                .skipWhile((part) => part.command == usedPart),
+          ],
+        );
+        return newCommandTemplatePart;
+      },
+      orElse: () => null,
+    );
   }
 }

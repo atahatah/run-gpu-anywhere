@@ -40,15 +40,22 @@ class TerminalPage extends HookConsumerWidget {
                   AsyncError(:final error) => Text('Error: $error'),
                   AsyncData(value: final loadedCurrentHost) => Column(
                       children: [
-                        SelectHost(
-                          currentHost: loadedCurrentHost,
-                          sshHosts: loadedSshHosts,
-                        ),
-                        Switch(
-                          value: manually.value,
-                          onChanged: (value) {
-                            manually.value = value;
-                          },
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            SelectHost(
+                              currentHost: loadedCurrentHost,
+                              sshHosts: loadedSshHosts,
+                            ),
+                            const SizedBox(width: 10),
+                            const Text('Manually:'),
+                            Switch(
+                              value: manually.value,
+                              onChanged: (value) {
+                                manually.value = value;
+                              },
+                            ),
+                          ],
                         ),
                         TerminalComponent(
                           host: loadedCurrentHost,
@@ -116,7 +123,7 @@ class TerminalComponent extends ConsumerWidget {
       AsyncData(value: final terminal) => Column(
           children: [
             SizedBox(
-              height: 300,
+              height: 200,
               child: TerminalView(
                 terminal,
                 deleteDetection: true,

@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:run_gpu_anywhere/src/model/entities/command/command_template.dart';
 import 'package:run_gpu_anywhere/src/model/use_cases/command/command_template_controller.dart';
