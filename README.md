@@ -20,4 +20,4 @@ flutter run
 ### ダウンロード
 次のリンクからお手元のスマホにアプリをインストールすることができます．
 - [Android on Firebase App Distribution](https://appdistribution.firebase.dev/i/bf4bcbec98f082b1)
-- iOSはTestFlightによる公開を申請中です．
+- [iOS on TestFlight](https://testflight.apple.com/join/QUdxNb0j)
