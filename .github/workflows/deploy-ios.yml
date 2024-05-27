@@ -93,12 +93,6 @@ jobs:
         run: |
           keychain add-certificates
 
-      - name : "Get latest build number from App Store Connect"
-        run: |
-          build_number=$(app-store-connect get-latest-build-number $APPLE_APP_ID)
-          new_build_number=$((build_number + 1))
-          echo "new_build_number=$new_build_number" >> $GITHUB_ENV
-
       - name : "Use provisioning profiles"
         run: |
           xcode-project use-profiles
@@ -111,7 +105,6 @@ jobs:
       - name: Build iOS app
         run: |
           flutter build ipa --release \
-            --build-number=$new_build_number \
             --export-options-plist=$HOME/export_options.plist
 
       - name: "Publish to App Store Connect"
