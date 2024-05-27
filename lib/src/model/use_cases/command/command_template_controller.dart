@@ -30,6 +30,22 @@ class CommandTemplateList extends _$CommandTemplateList {
       orElse: () {},
     );
   }
+
+  Future<void> delete(CommandTemplate commandTemplate) async {
+    state.maybeWhen(
+      data: (commandTemplateList) {
+        if (!commandTemplateList.contains(commandTemplate)) {
+          return;
+        }
+        state = AsyncData(
+          commandTemplateList
+              .where((element) => element != commandTemplate)
+              .toList(),
+        );
+      },
+      orElse: () {},
+    );
+  }
 }
 
 @Riverpod(keepAlive: true)

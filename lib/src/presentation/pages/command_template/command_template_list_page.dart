@@ -39,9 +39,17 @@ class CommandTemplateListPage extends ConsumerWidget {
             itemCount: commandTemplates.length,
             itemBuilder: (context, index) {
               final commandTemplate = commandTemplates[index];
-              return ListTile(
-                title: Text(commandTemplate.name),
-                onTap: () {},
+              return Dismissible(
+                onDismissed: (direction) {
+                  ref.read(commandTemplateListProvider.notifier).delete(
+                        commandTemplate,
+                      );
+                },
+                key: UniqueKey(),
+                child: ListTile(
+                  title: Text(commandTemplate.name),
+                  onTap: () {},
+                ),
               );
             },
           );
