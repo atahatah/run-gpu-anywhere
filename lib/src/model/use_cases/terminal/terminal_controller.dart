@@ -10,7 +10,7 @@ import 'virtual_keyboard_controller.dart';
 
 part 'terminal_controller.g.dart';
 
-@riverpod
+@Riverpod(keepAlive: true)
 class CurrentHost extends _$CurrentHost {
   @override
   Future<Host> build() async {
@@ -27,18 +27,11 @@ class CurrentHost extends _$CurrentHost {
   }
 }
 
-@riverpod
+@Riverpod(keepAlive: true)
 class TerminalController extends _$TerminalController {
   @override
-  Future<Terminal> build(Host host) async {
-    final repository = ref.watch(sshClientRepositoryProvider(host));
-    await repository.connect();
-    final virtualKeyboard = ref.watch(virtualKeyboardControllerProvider);
-    final terminal =
-        Terminal(onOutput: _inputHandler, inputHandler: virtualKeyboard);
-    repository.stdout?.listen(terminal.write);
-    repository.stderr?.listen(terminal.write);
-    return terminal;
+  Future<Terminal?> build(Host host) async {
+    return null;
   }
 
   void _inputHandler(String? message) {
@@ -47,6 +40,39 @@ class TerminalController extends _$TerminalController {
     }
     debugPrint(message);
     ref.watch(sshClientRepositoryProvider(host)).stdin(message);
+  }
+
+  Future<void> connect() async {
+    if (state is AsyncData<Terminal>) {
+      return;
+    }
+    state = const AsyncLoading();
+    try {
+      final repository = ref.watch(sshClientRepositoryProvider(host));
+      await repository.connect();
+      final virtualKeyboard = ref.watch(virtualKeyboardControllerProvider);
+      final terminal =
+          Terminal(onOutput: _inputHandler, inputHandler: virtualKeyboard);
+      repository.stdout?.listen(terminal.write);
+      repository.stderr?.listen(terminal.write);
+      state = AsyncData(terminal);
+    } on Exception catch (e, s) {
+      state = AsyncError(e, s);
+    }
+  }
+
+  Future<void> disconnect() async {
+    if (state is! AsyncData<Terminal>) {
+      return;
+    }
+    state = const AsyncLoading();
+    try {
+      final repository = ref.watch(sshClientRepositoryProvider(host));
+      await repository.disconnect();
+      state = const AsyncData(null);
+    } on Exception catch (e, s) {
+      state = AsyncError(e, s);
+    }
   }
 
   Future<String> run(String command) async {

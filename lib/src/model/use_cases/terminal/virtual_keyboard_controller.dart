@@ -5,7 +5,7 @@ import 'package:xterm/xterm.dart';
 
 part 'virtual_keyboard_controller.g.dart';
 
-@riverpod
+@Riverpod(keepAlive: true)
 VirtualKeyboard virtualKeyboardController(
   VirtualKeyboardControllerRef ref,
 ) {

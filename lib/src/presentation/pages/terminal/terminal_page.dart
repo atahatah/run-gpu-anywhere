@@ -48,6 +48,9 @@ class TerminalPage extends HookConsumerWidget {
                               sshHosts: loadedSshHosts,
                             ),
                             const SizedBox(width: 10),
+                            const Text('Connect:'),
+                            ConnectionSwitch(host: loadedCurrentHost),
+                            const SizedBox(width: 10),
                             const Text('Manually:'),
                             Switch(
                               value: manually.value,
@@ -70,6 +73,31 @@ class TerminalPage extends HookConsumerWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+class ConnectionSwitch extends ConsumerWidget {
+  const ConnectionSwitch({super.key, required this.host});
+  final Host host;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final terminal = ref.watch(terminalControllerProvider(host));
+    return terminal.when(
+      data: (terminal) => Switch(
+        value: terminal != null,
+        onChanged: (value) {
+          debugPrint('ConnectionSwitch onChanged: $value');
+          if (value) {
+            ref.read(terminalControllerProvider(host).notifier).connect();
+          } else {
+            ref.read(terminalControllerProvider(host).notifier).disconnect();
+          }
+        },
+      ),
+      error: (e, _) => const Text('Connection error'),
+      loading: CircularProgressIndicator.new,
     );
   }
 }
@@ -118,9 +146,14 @@ class TerminalComponent extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final terminal = ref.watch(terminalControllerProvider(host));
-    return switch (terminal) {
-      AsyncError(:final error) => Text('Error: $error'),
-      AsyncData(value: final terminal) => Column(
+    switch (terminal) {
+      case AsyncError(:final error):
+        return Text('Error: $error');
+      case AsyncData(value: final terminal):
+        if (terminal == null) {
+          return const Text('Disconnected');
+        }
+        return Column(
           children: [
             SizedBox(
               height: 200,
@@ -133,8 +166,9 @@ class TerminalComponent extends ConsumerWidget {
             if (manually) const VirtualKeyboardView(),
             if (!manually) const InputSuggester(),
           ],
-        ),
-      _ => const CircularProgressIndicator(),
-    };
+        );
+      default:
+        return const CircularProgressIndicator();
+    }
   }
 }

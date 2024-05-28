@@ -7,7 +7,7 @@ import '../../entities/ssh/host.dart';
 part 'ssh_host_controller.g.dart';
 
 /// SSHの接続先ホストを管理する
-@riverpod
+@Riverpod(keepAlive: true)
 class SSHHostList extends _$SSHHostList {
   @override
   Future<List<Host>> build() async {
