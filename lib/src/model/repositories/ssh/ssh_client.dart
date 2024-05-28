@@ -83,6 +83,7 @@ class SSHClientWrapper {
 
   Future<void> disconnect() async {
     debugPrint('closing shell...');
+    _client?.close();
     await _shell?.done;
     debugPrint('shell closed');
     debugPrint('closing client...');

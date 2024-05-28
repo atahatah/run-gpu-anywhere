@@ -43,7 +43,7 @@ class TerminalController extends _$TerminalController {
   }
 
   Future<void> connect() async {
-    if (state is AsyncData<Terminal>) {
+    if (state is AsyncData && (state as AsyncData).value != null) {
       return;
     }
     state = const AsyncLoading();
@@ -62,7 +62,7 @@ class TerminalController extends _$TerminalController {
   }
 
   Future<void> disconnect() async {
-    if (state is! AsyncData<Terminal>) {
+    if (state is! AsyncData || (state as AsyncData).value == null) {
       return;
     }
     state = const AsyncLoading();
